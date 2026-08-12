@@ -8,3 +8,4 @@ function App() {
 }
 
 export default App
+// TODO: Color pill text in combined list (dark text for light category colors)
