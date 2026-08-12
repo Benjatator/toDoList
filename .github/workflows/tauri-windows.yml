@@ -20,6 +20,11 @@ jobs:
           node-version: '24'
           cache: 'npm'
 
+      - name: Check Node / npm versions
+        run: |
+          node -v
+          npm -v
+
       - name: Install frontend dependencies
         run: npm ci
 
