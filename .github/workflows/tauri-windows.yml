@@ -31,10 +31,10 @@ jobs:
       - name: Build frontend
         run: npm run build
 
-      - name: Setup Rust toolchain
+      - name: Setup Rust toolchain (use nightly for edition2024)
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: 1.77.2
+          toolchain: nightly
           override: true
 
       - name: Ensure NSIS (for Windows installers)
