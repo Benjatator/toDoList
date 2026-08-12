@@ -1,18 +1,22 @@
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 
 function ToDoList(){
 
-    const [tasks, setTasks] = useState([]);
+    const [tasks, setTasks] = useState(() => JSON.parse(localStorage.getItem('todo-tasks') ?? '[]'));
     const [newTask, setNewTask] = useState("");
     const [newDueDate, setNewDueDate] = useState("");
     const [newCategory, setNewCategory] = useState("");
-    const nextId = useRef(0);
+    const nextId = useRef(Math.max(0, ...JSON.parse(localStorage.getItem('todo-tasks') ?? '[]').map(t => t.id + 1)));
 
-    const [groupByCategory, setGroupByCategory] = useState(false);
+    const [groupByCategory, setGroupByCategory] = useState(() => JSON.parse(localStorage.getItem('todo-groupByCategory') ?? 'false'));
     const [showSettings, setShowSettings] = useState(false);
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState(() => JSON.parse(localStorage.getItem('todo-categories') ?? '[]'));
     const [newCategoryInput, setNewCategoryInput] = useState("");
     const [newCategoryColor, setNewCategoryColor] = useState("#5b8dd9");
+
+    useEffect(() => { localStorage.setItem('todo-tasks', JSON.stringify(tasks)); }, [tasks]);
+    useEffect(() => { localStorage.setItem('todo-categories', JSON.stringify(categories)); }, [categories]);
+    useEffect(() => { localStorage.setItem('todo-groupByCategory', JSON.stringify(groupByCategory)); }, [groupByCategory]);
 
     function handleInputChange(event){
         setNewTask(event.target.value);
