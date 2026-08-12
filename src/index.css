@@ -1,0 +1,258 @@
+body{
+  background-color: hsla(0, 0%, 0%, 0.815)
+}
+
+.to-do-list{
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin-top: 100px;
+}
+
+h1{
+  font-size: 4rem;
+  color: white;
+}
+
+button{
+  font-size: 1.7rem;
+  font-weight: bold;
+  padding: 10px 20px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.5s ease;
+}
+
+.add-button{
+  background-color: hsl(125, 47%, 54%);
+}
+
+.add-button:hover{
+  background-color: hsl(125, 47%, 44%);
+}
+
+.delete-button{
+  background-color: hsl(0, 63%, 42%);
+}
+
+.delete-button:hover{
+  background-color: hsl(0, 63%, 32%);
+}
+
+.input-row{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+input[type="text"],
+input[type="date"]{
+  font-size: 1.6rem;
+  padding: 10px;
+  border: 2px solid hsla(0, 0%, 0%, .3);
+  border-radius: 5px;
+  color: hsla(0, 0%, 0%, 0.5);
+  background-color: white;
+  max-width: 60%;
+}
+
+.task-input{
+  width: 280px;
+  max-width: 280px;
+}
+
+.task-list{
+  max-width: 55%;
+  margin: 0 auto;
+}
+
+.category-group{
+  margin-bottom: 24px;
+}
+
+.category-header{
+  color: white;
+  font-size: 2rem;
+  text-align: left;
+  margin-bottom: 8px;
+  border-bottom: 2px solid hsl(0, 0%, 40%);
+  padding-bottom: 4px;
+}
+
+ol{
+  padding: 10px;
+  margin: 0;
+}
+
+li{
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 15px;
+  background-color: hsl(0, 0%, 97%);
+  margin-bottom: 10px;
+  border: 3px solid hsl(0, 0%, 85%);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.text{
+  flex: 1;
+}
+
+.due-date{
+  font-size: 1.4rem;
+  font-weight: normal;
+  color: hsl(0, 0%, 45%);
+}
+
+.delete-button{
+  padding: 8px 12px;
+  font-size: 1.4rem;
+  margin-left: 10px
+}
+
+.settings-bar{
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+  /* needed so the absolute-positioned panel anchors to this element */
+  display: inline-block;
+}
+
+.settings-button{
+  background-color: hsl(220, 15%, 40%);
+  font-size: 1.3rem;
+  padding: 8px 16px;
+}
+
+.settings-button:hover{
+  background-color: hsl(220, 15%, 30%);
+}
+
+.settings-panel{
+  position: fixed;
+  top: 15px;
+  right: 80px;
+  background-color: hsl(0, 0%, 20%);
+  border: 2px solid hsl(0, 0%, 30%);
+  border-radius: 8px;
+  padding: 16px;
+  width: 320px;
+  text-align: left;
+  z-index: 99;
+}
+
+.settings-toggle{
+  color: white;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.settings-toggle input[type="checkbox"]{
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.category-manager{
+  margin-top: 14px;
+}
+
+.category-add-row{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.category-add-row input{
+  font-size: 1.4rem;
+  padding: 8px;
+  border-radius: 5px;
+  border: 2px solid hsla(0, 0%, 0%, .3);
+}
+
+.category-add-row .add-button{
+  font-size: 1.3rem;
+  padding: 8px 14px;
+}
+
+.category-list{
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.category-item{
+  background-color: hsl(0, 0%, 30%);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 1.3rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0;
+}
+
+.category-color-dot{
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.color-picker{
+  width: 36px;
+  height: 36px;
+  padding: 2px;
+  border: 2px solid hsla(0, 0%, 0%, .3);
+  border-radius: 5px;
+  background: white;
+  cursor: pointer;
+}
+
+.category-item .delete-button{
+  background: none;
+  color: hsl(0, 0%, 70%);
+  font-size: 1.1rem;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+}
+
+.category-item .delete-button:hover{
+  background: none;
+  color: white;
+}
+
+.category-select{
+  font-size: 1.6rem;
+  padding: 10px;
+  border: 2px solid hsla(0, 0%, 0%, .3);
+  border-radius: 5px;
+  color: hsla(0, 0%, 0%, 0.5);
+  background-color: white;
+}
+
+.task-category{
+  font-size: 1.1rem;
+  font-weight: normal;
+  background-color: hsl(220, 50%, 60%);
+  color: white;
+  border-radius: 12px;
+  padding: 2px 10px;
+  margin-left: 10px;
+  vertical-align: middle;
+}
