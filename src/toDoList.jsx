@@ -1,4 +1,13 @@
 import React, {useState, useRef, useEffect} from 'react'
+import CHANGELOG from './changelog.js'
+
+function getContrastColor(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    // perceived luminance
+    return (r * 299 + g * 587 + b * 114) / 1000 >= 175 ? '#000000' : '#ffffff';
+}
 
 function ToDoList(){
 
@@ -10,6 +19,7 @@ function ToDoList(){
 
     const [groupByCategory, setGroupByCategory] = useState(() => JSON.parse(localStorage.getItem('todo-groupByCategory') ?? 'false'));
     const [showSettings, setShowSettings] = useState(false);
+    const [showChangelog, setShowChangelog] = useState(false);
     const [categories, setCategories] = useState(() => JSON.parse(localStorage.getItem('todo-categories') ?? '[]'));
     const [newCategoryInput, setNewCategoryInput] = useState("");
     const [newCategoryColor, setNewCategoryColor] = useState("#5b8dd9");
@@ -50,6 +60,7 @@ function ToDoList(){
     }
 
     return(
+        <>
         <div className="to-do-list">
             <h1>To-Do List</h1>
 
@@ -94,6 +105,8 @@ function ToDoList(){
                             ))}
                         </ul>
                     </div>
+
+                    <button className="changelog-button" onClick={() => setShowChangelog(true)}>📋 View Changelog</button>
                 </div>
             )}
 
@@ -143,7 +156,7 @@ function ToDoList(){
                                 <span className="text">
                                     {task.text}
                                     {showPill && catObj && (
-                                        <span className="task-category" style={{backgroundColor: catObj.color}}>{catObj.name}</span>
+                                        <span className="task-category" style={{backgroundColor: catObj.color, color: getContrastColor(catObj.color)}}>{catObj.name}</span>
                                     )}
                                     {task.dueDate && <span className="due-date"> - Due: {new Date(task.dueDate + 'T00:00:00').toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}</span>}
                                 </span>
@@ -183,7 +196,35 @@ function ToDoList(){
             </div>
 
         </div>
-    )
+
+        {showChangelog && (
+            <div className="changelog-overlay" onClick={() => setShowChangelog(false)}>
+                <div className="changelog-modal" onClick={e => e.stopPropagation()}>
+                    <div className="changelog-header">
+                        <h2>Version History</h2>
+                        <button className="changelog-close" onClick={() => setShowChangelog(false)}>✕</button>
+                    </div>
+                    <div className="changelog-body">
+                        {CHANGELOG.map(entry => (
+                            <div key={entry.version} className="changelog-entry">
+                                <div className="changelog-version">
+                                    <span className="changelog-version-tag">v{entry.version}</span>
+                                    <span className="changelog-date">{new Date(entry.date + 'T00:00:00').toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'})}</span>
+                                </div>
+                                <ul className="changelog-changes">
+                                    {entry.changes.map((change, i) => (
+                                        <li key={i}>{change}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        )}
+
+        </>
+    );
 }
 
 export default ToDoList

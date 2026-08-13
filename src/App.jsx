@@ -8,4 +8,8 @@ function App() {
 }
 
 export default App
-// TODO: Color pill text in combined list (dark text for light category colors)
+
+// (Kinda ironic/funny that I'm creating a code-comment TODO list when I'm literally making a to-do list app)
+
+// TODO: 
+// Add automatic updates for users without a reinstall 
