@@ -1,3 +1,6 @@
+# Signing keys — never commit (Keys were generated in the wrong location. Already deleted, but still ignored just in case)
+~/.tauri/
+
 # Logs
 logs
 *.log

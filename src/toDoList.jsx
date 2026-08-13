@@ -1,5 +1,6 @@
 import React, {useState, useRef, useEffect} from 'react'
 import CHANGELOG from './changelog.js'
+import { check } from '@tauri-apps/plugin-updater'
 
 function getContrastColor(hex) {
     const r = parseInt(hex.slice(1, 3), 16);
@@ -20,6 +21,9 @@ function ToDoList(){
     const [groupByCategory, setGroupByCategory] = useState(() => JSON.parse(localStorage.getItem('todo-groupByCategory') ?? 'false'));
     const [showSettings, setShowSettings] = useState(false);
     const [showChangelog, setShowChangelog] = useState(false);
+    // 'idle' | 'checking' | 'available' | 'downloading' | 'upToDate' | 'error'
+    const [updateStatus, setUpdateStatus] = useState('idle');
+    const [updateVersion, setUpdateVersion] = useState(null);
     const [categories, setCategories] = useState(() => JSON.parse(localStorage.getItem('todo-categories') ?? '[]'));
     const [newCategoryInput, setNewCategoryInput] = useState("");
     const [newCategoryColor, setNewCategoryColor] = useState("#5b8dd9");
@@ -52,6 +56,26 @@ function ToDoList(){
         }
         setNewCategoryInput("");
         setNewCategoryColor("#5b8dd9");
+    }
+
+    async function handleUpdate(){
+        if (updateStatus === 'checking' || updateStatus === 'downloading') return;
+        setUpdateStatus('checking');
+        setUpdateVersion(null);
+        try {
+            const update = await check();
+            if (!update) {
+                setUpdateStatus('upToDate');
+                return;
+            }
+            setUpdateVersion(update.version);
+            setUpdateStatus('downloading');
+            await update.downloadAndInstall();
+            // app will restart; status below is a fallback
+            setUpdateStatus('idle');
+        } catch (e) {
+            setUpdateStatus('error');
+        }
     }
 
     function deleteCategory(name){
@@ -104,6 +128,19 @@ function ToDoList(){
                                 </li>
                             ))}
                         </ul>
+                    </div>
+
+                    <div className="updater-row">
+                        <button
+                            className="updater-button"
+                            onClick={handleUpdate}
+                            disabled={updateStatus === 'checking' || updateStatus === 'downloading'}>
+                            {updateStatus === 'checking' && '🔍 Checking...'}
+                            {updateStatus === 'downloading' && `⬇️ Installing v${updateVersion}...`}
+                            {(updateStatus === 'idle' || updateStatus === 'upToDate' || updateStatus === 'available' || updateStatus === 'error') && '🔄 Check for Updates'}
+                        </button>
+                        {updateStatus === 'upToDate' && <span className="updater-status updater-ok">✓ Up to date</span>}
+                        {updateStatus === 'error' && <span className="updater-status updater-err">✕ Update check failed. Please Contact Support for assistance.</span>}
                     </div>
 
                     <button className="changelog-button" onClick={() => setShowChangelog(true)}>📋 View Changelog</button>

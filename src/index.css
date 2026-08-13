@@ -280,6 +280,43 @@ li{
   background-color: hsl(220, 15%, 25%);
 }
 
+.updater-row{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.updater-button{
+  background-color: hsl(220, 15%, 35%);
+  font-size: 1.3rem;
+  padding: 8px 14px;
+  white-space: nowrap;
+}
+
+.updater-button:hover:not(:disabled){
+  background-color: hsl(220, 15%, 25%);
+}
+
+.updater-button:disabled{
+  opacity: 0.6;
+  cursor: default;
+}
+
+.updater-status{
+  font-size: 1.2rem;
+  font-weight: normal;
+}
+
+.updater-ok{
+  color: hsl(125, 47%, 54%);
+}
+
+.updater-err{
+  color: hsl(0, 63%, 60%);
+}
+
 .changelog-overlay{
   position: fixed;
   inset: 0;

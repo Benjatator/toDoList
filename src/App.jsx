@@ -13,3 +13,4 @@ export default App
 
 // TODO: 
 // Add automatic updates for users without a reinstall 
+// Add pictures for app icons, taskbar, start menu, etc.
