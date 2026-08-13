@@ -24,6 +24,7 @@ function ToDoList(){
     // 'idle' | 'checking' | 'available' | 'downloading' | 'upToDate' | 'error'
     const [updateStatus, setUpdateStatus] = useState('idle');
     const [updateVersion, setUpdateVersion] = useState(null);
+    const [updateError, setUpdateError] = useState(null);
     const [categories, setCategories] = useState(() => JSON.parse(localStorage.getItem('todo-categories') ?? '[]'));
     const [newCategoryInput, setNewCategoryInput] = useState("");
     const [newCategoryColor, setNewCategoryColor] = useState("#5b8dd9");
@@ -62,6 +63,7 @@ function ToDoList(){
         if (updateStatus === 'checking' || updateStatus === 'downloading') return;
         setUpdateStatus('checking');
         setUpdateVersion(null);
+        setUpdateError(null);
         try {
             const update = await check();
             if (!update) {
@@ -74,6 +76,8 @@ function ToDoList(){
             // app will restart; status below is a fallback
             setUpdateStatus('idle');
         } catch (e) {
+            console.error('Updater error:', e);
+            setUpdateError(String(e));
             setUpdateStatus('error');
         }
     }
@@ -140,7 +144,7 @@ function ToDoList(){
                             {(updateStatus === 'idle' || updateStatus === 'upToDate' || updateStatus === 'available' || updateStatus === 'error') && '🔄 Check for Updates'}
                         </button>
                         {updateStatus === 'upToDate' && <span className="updater-status updater-ok">✓ Up to date</span>}
-                        {updateStatus === 'error' && <span className="updater-status updater-err">✕ Update check failed. Please Contact Support for assistance.</span>}
+                        {updateStatus === 'error' && <span className="updater-status updater-err">✕ {updateError ?? 'Update check failed'}</span>}
                     </div>
 
                     <button className="changelog-button" onClick={() => setShowChangelog(true)}>📋 View Changelog</button>
