@@ -1,6 +1,6 @@
 const CHANGELOG = [
     {
-        version: "0.2.0",
+        version: "0.2.3",
         date: "2026-08-20",
         changes: [
             "• New setting allows for automatic update tracking: no more need for uninstalling/reinstalling every update.",
