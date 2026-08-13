@@ -56,13 +56,10 @@ jobs:
         id: artifacts
         shell: pwsh
         run: |
-          $exe  = Get-ChildItem src-tauri/target/release/bundle/nsis -Filter "*-setup.exe"     | Select-Object -First 1
-          $zip  = Get-ChildItem src-tauri/target/release/bundle/nsis -Filter "*.nsis.zip"      | Select-Object -First 1
-          $sig  = Get-ChildItem src-tauri/target/release/bundle/nsis -Filter "*.nsis.zip.sig"  | Select-Object -First 1
+          $exe  = Get-ChildItem src-tauri/target/release/bundle/nsis -Filter "*-setup.exe"    | Select-Object -First 1
+          $sig  = Get-ChildItem src-tauri/target/release/bundle/nsis -Filter "*-setup.exe.sig" | Select-Object -First 1
           echo "EXE_PATH=$($exe.FullName)"  >> $env:GITHUB_OUTPUT
           echo "EXE_NAME=$($exe.Name)"      >> $env:GITHUB_OUTPUT
-          echo "ZIP_PATH=$($zip.FullName)"  >> $env:GITHUB_OUTPUT
-          echo "ZIP_NAME=$($zip.Name)"      >> $env:GITHUB_OUTPUT
           echo "SIG_PATH=$($sig.FullName)"  >> $env:GITHUB_OUTPUT
 
       - name: Generate latest.json
@@ -70,7 +67,7 @@ jobs:
         run: |
           $version = "${{ github.ref_name }}" -replace '^v', ''
           $sig = Get-Content "${{ steps.artifacts.outputs.SIG_PATH }}" -Raw
-          $url = "https://github.com/Benjatator/toDoList/releases/download/${{ github.ref_name }}/${{ steps.artifacts.outputs.ZIP_NAME }}"
+          $url = "https://github.com/Benjatator/toDoList/releases/download/${{ github.ref_name }}/${{ steps.artifacts.outputs.EXE_NAME }}"
           $manifest = @{
             version  = $version
             notes    = "See the changelog in the app for release notes."
@@ -90,7 +87,6 @@ jobs:
         with:
           files: |
             ${{ steps.artifacts.outputs.EXE_PATH }}
-            ${{ steps.artifacts.outputs.ZIP_PATH }}
             latest.json
           generate_release_notes: false
           body: "See the in-app changelog for release notes."
