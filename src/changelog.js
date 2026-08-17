@@ -9,7 +9,8 @@ const CHANGELOG = [
             "• When adding a sub-task, the input section will now wrap for smaller windows.",
             "• Users can now adjust the width of the task list items via a slider in the settings panel.",
             "• Added setting to collapse tasks beyond 30 days.",
-            "• Fixed tasks not auto-marking as past due correctly. Tasks now update their status at midnight automatically."
+            "• Fixed tasks not auto-marking as past due correctly. Tasks now update their status at midnight automatically.",
+            "• The changelog now forces open on new versions.",
         ],
     },
     {

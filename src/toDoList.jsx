@@ -29,7 +29,16 @@ function ToDoList(){
     const [editingId, setEditingId] = useState(null);
     const [editDraft, setEditDraft] = useState({text: "", dueDate: "", category: "", hasSubtasks: false});
     const [showSettings, setShowSettings] = useState(false);
-    const [showChangelog, setShowChangelog] = useState(false);
+    // Auto-show changelog when the app version is newer than what the user last saw
+    const [showChangelog, setShowChangelog] = useState(() => {
+        const current = CHANGELOG[0]?.version ?? '';
+        const seen = localStorage.getItem('todo-lastSeenVersion') ?? '';
+        if (current && current !== seen) {
+            localStorage.setItem('todo-lastSeenVersion', current);
+            return true;
+        }
+        return false;
+    });
     // 'idle' | 'checking' | 'available' | 'downloading' | 'upToDate' | 'error'
     const [updateStatus, setUpdateStatus] = useState('idle');
     const [updateVersion, setUpdateVersion] = useState(null);
