@@ -1,7 +1,7 @@
 const CHANGELOG = [
     {
         version: "0.3.0",
-        date: "2026-09-01",
+        date: "2026-08-17",
         changes: [
             "Lots of Visual Updates:",
             "• Fixed strikethrough line for subtask name and due date so they line up.",
@@ -14,7 +14,7 @@ const CHANGELOG = [
     },
     {
         version: "0.2.4",
-        date: "2026-08-27",
+        date: "2026-08-17",
         changes: [
             "• Added ability to edit tasks.",
             "• Overdue tasks will now be marked with a red '!'.",
@@ -24,7 +24,7 @@ const CHANGELOG = [
     },
     {
         version: "0.2.3",
-        date: "2026-08-20",
+        date: "2026-08-13",
         changes: [
             "• New setting allows for automatic update tracking: no more need for uninstalling/reinstalling every update.",
             "• Updated icons (taskbar, start menu, etc.)",
@@ -41,7 +41,7 @@ const CHANGELOG = [
     },
     {
         version: "0.1.0",
-        date: "2026-08-01",
+        date: "2026-08-13",
         changes: [
             "Initial release!",
             "• Allows for adding, viewing, and deleting tasks",
