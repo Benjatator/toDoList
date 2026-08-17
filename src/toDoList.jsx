@@ -23,6 +23,8 @@ function ToDoList(){
     const nextId = useRef(Math.max(0, ...JSON.parse(localStorage.getItem('todo-tasks') ?? '[]').map(t => t.id + 1)));
 
     const [groupByCategory, setGroupByCategory] = useState(() => JSON.parse(localStorage.getItem('todo-groupByCategory') ?? 'false'));
+    const [collapseFarTasks, setCollapseFarTasks] = useState(() => JSON.parse(localStorage.getItem('todo-collapseFarTasks') ?? 'false'));
+    const [taskListWidth, setTaskListWidth] = useState(() => JSON.parse(localStorage.getItem('todo-taskListWidth') ?? '75'));
     // editingId tracks which task row is currently in edit mode
     const [editingId, setEditingId] = useState(null);
     const [editDraft, setEditDraft] = useState({text: "", dueDate: "", category: "", hasSubtasks: false});
@@ -46,11 +48,25 @@ function ToDoList(){
     // { taskId, subtaskId } identifying which subtask is being edited
     const [editingSubtask, setEditingSubtask] = useState(null);
     const [subtaskEditDraft, setSubtaskEditDraft] = useState({text: "", dueDate: ""});
+    const [today, setToday] = useState(() => { const d = new Date(); d.setHours(0,0,0,0); return d; });
+
+    // Re-render at midnight so overdue indicators update without a page refresh
+    useEffect(() => {
+        const now = new Date();
+        const msUntilMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now;
+        const id = setTimeout(() => {
+            const d = new Date(); d.setHours(0,0,0,0);
+            setToday(d);
+        }, msUntilMidnight);
+        return () => clearTimeout(id);
+    }, [today]);
 
     // Sync state to localStorage whenever it changes
     useEffect(() => { localStorage.setItem('todo-tasks', JSON.stringify(tasks)); }, [tasks]);
     useEffect(() => { localStorage.setItem('todo-categories', JSON.stringify(categories)); }, [categories]);
     useEffect(() => { localStorage.setItem('todo-groupByCategory', JSON.stringify(groupByCategory)); }, [groupByCategory]);
+    useEffect(() => { localStorage.setItem('todo-taskListWidth', JSON.stringify(taskListWidth)); }, [taskListWidth]);
+    useEffect(() => { localStorage.setItem('todo-collapseFarTasks', JSON.stringify(collapseFarTasks)); }, [collapseFarTasks]);
 
     function handleInputChange(event){
         setNewTask(event.target.value);
@@ -175,6 +191,23 @@ function ToDoList(){
                             onChange={e => setGroupByCategory(e.target.checked)}/>
                         Group tasks by category
                     </label>
+                    <label className="settings-toggle">
+                        <input
+                            type="checkbox"
+                            checked={collapseFarTasks}
+                            onChange={e => setCollapseFarTasks(e.target.checked)}/>
+                        Collapse tasks beyond 30 days
+                    </label>
+
+                    <div className="width-slider-row">
+                        <span className="width-slider-label">Task Bar Width: {taskListWidth}%</span>
+                        <input
+                            type="range"
+                            min="20"
+                            max="100"
+                            value={taskListWidth}
+                            onChange={e => setTaskListWidth(Number(e.target.value))}/>
+                    </div>
 
                     <div className="category-manager">
                         <div className="category-add-row">
@@ -256,7 +289,7 @@ function ToDoList(){
                 </button>
             </div>
 
-            <div className="task-list">
+            <div className="task-list" style={{width: `${taskListWidth}%`, maxWidth: `${taskListWidth}%`}}>
                 {(() => {
                     // Sort tasks by due date ascending; undated tasks go to the bottom
                     const sorted = [...tasks].sort((a, b) => {
@@ -266,7 +299,6 @@ function ToDoList(){
                         return a.dueDate.localeCompare(b.dueDate);
                     });
 
-                    const today = new Date(); today.setHours(0, 0, 0, 0);
                     const renderTask = (task, showPill = false) => {
                         const catObj = categories.find(c => c.name === task.category);
                         const hasOverdueSubtask = (task.subtasks ?? []).some(s => !s.completed && s.dueDate && new Date(s.dueDate + 'T00:00:00') < today);
@@ -398,8 +430,23 @@ function ToDoList(){
                         );
                     };
 
+                    const cutoff = new Date(today); cutoff.setDate(cutoff.getDate() + 30);
+                    const isNear = task => !task.dueDate || new Date(task.dueDate + 'T00:00:00') <= cutoff;
+
+                    const renderFarSection = (farTasks, showPills) => {
+                        if (!collapseFarTasks || farTasks.length === 0) return farTasks.map(t => renderTask(t, showPills));
+                        return (
+                            <details key="far-tasks" className="far-tasks-details">
+                                <summary className="far-tasks-summary">Tasks beyond 30 days ({farTasks.length})</summary>
+                                {farTasks.map(t => renderTask(t, showPills))}
+                            </details>
+                        );
+                    };
+
                     if (!groupByCategory) {
-                        return <ol>{sorted.map(t => renderTask(t, true))}</ol>;
+                        const near = sorted.filter(isNear);
+                        const far = sorted.filter(t => !isNear(t));
+                        return <ol>{near.map(t => renderTask(t, true))}{renderFarSection(far, true)}</ol>;
                     }
 
                     // Build groups keyed by category name; uncategorized tasks go last under ""
@@ -415,12 +462,16 @@ function ToDoList(){
                         ...(groups[""] ? [""] : [])
                     ];
 
-                    return orderedKeys.map(key => (
-                        <div key={key} className="category-group">
-                            <h2 className="category-header">{key || "Uncategorized"}</h2>
-                            <ol>{groups[key].map(t => renderTask(t))}</ol>
-                        </div>
-                    ));
+                    return orderedKeys.map(key => {
+                        const near = groups[key].filter(isNear);
+                        const far = groups[key].filter(t => !isNear(t));
+                        return (
+                            <div key={key} className="category-group">
+                                <h2 className="category-header">{key || "Uncategorized"}</h2>
+                                <ol>{near.map(t => renderTask(t))}{renderFarSection(far, false)}</ol>
+                            </div>
+                        );
+                    });
                 })()}
             </div>
 

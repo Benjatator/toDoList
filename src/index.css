@@ -37,8 +37,9 @@ button{
 
 .delete-button,
 .edit-button{
-  width: 48px;
-  height: 48px;
+  width: 28px;
+  height: 28px;
+  font-size: 0.85rem;
   padding: 0;
   flex-shrink: 0;
 }
@@ -121,12 +122,43 @@ input[type="date"]{
 
 /* ── Task list ──────────────────────────────────────────── */
 .task-list{
-  max-width: 55%;
   margin: 0 auto;
 }
 
 .category-group{
   margin-bottom: 24px;
+}
+
+.far-tasks-details{
+  margin-top: 8px;
+}
+
+.far-tasks-summary{
+  color: hsl(213, 55%, 72%);
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 5px;
+  list-style: none;
+  user-select: none;
+  text-align: left;
+  border: 1px solid hsl(0, 0%, 35%);
+  border-radius: 5px;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
+.far-tasks-summary::-webkit-details-marker{
+  display: none;
+}
+
+.far-tasks-summary::before{
+  content: '▶ ';
+  font-size: 0.9em;
+}
+
+details[open] .far-tasks-summary::before{
+  content: '▼ ';
 }
 
 .category-header{
@@ -136,6 +168,11 @@ input[type="date"]{
   margin-bottom: 8px;
   border-bottom: 2px solid hsl(0, 0%, 40%);
   padding-bottom: 4px;
+  width: 55vw;
+  /* break out of task-list container and center on viewport */
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 ol{
@@ -310,6 +347,7 @@ li{
 
 .subtask-text{
   flex: 1;
+  font-size: 1.4rem;
   color: hsl(0, 0%, 20%);
 }
 
@@ -340,6 +378,7 @@ li{
 
 .subtask-add-row{
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
   align-items: center;
@@ -371,8 +410,6 @@ li{
 }
 
 .delete-button{
-  padding: 8px 12px;
-  font-size: 1.4rem;
   margin-left: 10px
 }
 
@@ -415,6 +452,23 @@ li{
   display: flex;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
+}
+
+.width-slider-row{
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.width-slider-label{
+  color: white;
+  font-size: 1.4rem;
+}
+
+.width-slider-row input[type="range"]{
+  width: 100%;
   cursor: pointer;
 }
 

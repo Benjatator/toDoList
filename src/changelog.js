@@ -1,12 +1,25 @@
 const CHANGELOG = [
     {
+        version: "0.3.0",
+        date: "2026-09-01",
+        changes: [
+            "Lots of Visual Updates:",
+            "• Fixed strikethrough line for subtask name and due date so they line up.",
+            "• Decreased the size of the main task's edit and delete buttons to reduce clutter on smaller windows.",
+            "• When adding a sub-task, the input section will now wrap for smaller windows.",
+            "• Users can now adjust the width of the task list items via a slider in the settings panel.",
+            "• Added setting to collapse tasks beyond 30 days.",
+            "• Fixed tasks not auto-marking as past due correctly. Tasks now update their status at midnight automatically."
+        ],
+    },
+    {
         version: "0.2.4",
         date: "2026-08-27",
         changes: [
             "• Added ability to edit tasks.",
-            "• Commented some backend code for readability.",
             "• Overdue tasks will now be marked with a red '!'.",
             "• Tasks can now have sub-tasks that can be checked off, each with their own due date. If a sub-task is past due, it will also give itself and its main task an overdue indicator.",
+            "• Commented some backend code for readability.",
         ],
     },
     {
