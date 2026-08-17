@@ -4,7 +4,9 @@ const CHANGELOG = [
         date: "2026-08-27",
         changes: [
             "• Added ability to edit tasks.",
-            "• Commented backend code for readability.",
+            "• Commented some backend code for readability.",
+            "• Overdue tasks will now be marked with a red '!'.",
+            "• Tasks can now have sub-tasks that can be checked off, each with their own due date. If a sub-task is past due, it will also give itself and its main task an overdue indicator.",
         ],
     },
     {

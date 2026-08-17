@@ -166,6 +166,210 @@ li{
   color: hsl(0, 0%, 45%);
 }
 
+.subtasks-toggle{
+  font-size: 1.2rem;
+  font-weight: normal;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  cursor: pointer;
+  color: hsl(0, 0%, 80%);
+}
+
+/* hide the real checkbox; the slider is built from the label */
+.subtasks-toggle input[type="checkbox"]{
+  appearance: none;
+  position: relative;
+  width: 38px;
+  height: 22px;
+  background-color: hsl(0, 0%, 40%);
+  border-radius: 11px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+}
+
+.subtasks-toggle input[type="checkbox"]::after{
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.subtasks-toggle input[type="checkbox"]:checked{
+  background-color: hsl(220, 70%, 55%);
+}
+
+.subtasks-toggle input[type="checkbox"]:checked::after{
+  transform: translateX(16px);
+}
+
+.subtasks-expand-btn{
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  padding: 0 4px;
+  cursor: pointer;
+  color: hsl(220, 50%, 65%);
+  transition: transform 0.2s;
+  order: -1;
+}
+
+.subtasks-expand-btn.expanded{
+  transform: rotate(90deg);
+}
+
+.task-item{
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+.task-row{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.task-row .text{
+  flex: 1;
+}
+
+.subtask-progress{
+  font-size: 1.1rem;
+  font-weight: normal;
+  color: hsl(220, 50%, 65%);
+  margin-left: 8px;
+}
+
+@keyframes subtask-slide-in{
+  from{ opacity: 0; transform: translateY(-6px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
+
+.subtask-panel{
+  display: none;
+  margin-top: 10px;
+  padding: 10px 12px;
+  background-color: hsl(0, 0%, 92%);
+  border-radius: 4px;
+  border-top: 1px solid hsl(0, 0%, 80%);
+}
+
+.subtask-panel.open{
+  display: block;
+  animation: subtask-slide-in 0.25s ease forwards;
+}
+
+.subtask-list{
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px 0;
+}
+
+.subtask-item{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.2rem;
+  font-weight: normal;
+  padding: 8px 0;
+  background: none;
+  border: none;
+  margin: 0;
+  position: relative;
+}
+
+.subtask-item::after{
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 8%;
+  right: 8%;
+  height: 1px;
+  background-color: hsl(0, 0%, 78%);
+}
+
+.subtask-item:last-child::after{
+  display: none;
+}
+
+.subtask-item input[type="checkbox"]{
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.subtask-text{
+  flex: 1;
+  color: hsl(0, 0%, 20%);
+}
+
+.subtask-text.completed{
+  text-decoration: line-through;
+  color: hsl(0, 0%, 55%);
+}
+
+.subtask-delete{
+  margin-left: 0;
+}
+
+.subtask-item .edit-button,
+.subtask-item .delete-button{
+  width: 28px;
+  height: 28px;
+  font-size: 0.85rem;
+  padding: 0;
+}
+
+.subtask-overdue{
+  font-size: 1.2rem;
+  min-width: auto;
+  order: unset;
+  margin-left: auto;
+}
+
+
+.subtask-add-row{
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.subtask-input{
+  flex: 1;
+  font-size: 1.1rem;
+  padding: 4px 8px;
+}
+
+.subtask-add-btn{
+  font-size: 1.1rem;
+  padding: 4px 12px;
+}
+
+.subtask-date-input{
+  font-size: 1.1rem;
+  padding: 4px 6px;
+}
+
+.overdue-indicator{
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: hsl(0, 100%, 45%);
+  min-width: 1.2rem;
+  text-align: center;
+  order: -1;
+}
+
 .delete-button{
   padding: 8px 12px;
   font-size: 1.4rem;

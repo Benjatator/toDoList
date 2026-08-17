@@ -25,7 +25,7 @@ function ToDoList(){
     const [groupByCategory, setGroupByCategory] = useState(() => JSON.parse(localStorage.getItem('todo-groupByCategory') ?? 'false'));
     // editingId tracks which task row is currently in edit mode
     const [editingId, setEditingId] = useState(null);
-    const [editDraft, setEditDraft] = useState({text: "", dueDate: "", category: ""});
+    const [editDraft, setEditDraft] = useState({text: "", dueDate: "", category: "", hasSubtasks: false});
     const [showSettings, setShowSettings] = useState(false);
     const [showChangelog, setShowChangelog] = useState(false);
     // 'idle' | 'checking' | 'available' | 'downloading' | 'upToDate' | 'error'
@@ -36,6 +36,16 @@ function ToDoList(){
     const [categories, setCategories] = useState(() => JSON.parse(localStorage.getItem('todo-categories') ?? '[]'));
     const [newCategoryInput, setNewCategoryInput] = useState("");
     const [newCategoryColor, setNewCategoryColor] = useState("#5b8dd9");
+    const [newHasSubtasks, setNewHasSubtasks] = useState(false);
+    // set of task IDs whose subtask panel is currently expanded
+    const [expandedIds, setExpandedIds] = useState(new Set());
+    // tracks the current text being typed in each task's subtask add-input
+    const [subtaskInputs, setSubtaskInputs] = useState({});
+    // tracks the date input for each task's subtask add-row
+    const [subtaskDateInputs, setSubtaskDateInputs] = useState({});
+    // { taskId, subtaskId } identifying which subtask is being edited
+    const [editingSubtask, setEditingSubtask] = useState(null);
+    const [subtaskEditDraft, setSubtaskEditDraft] = useState({text: "", dueDate: ""});
 
     // Sync state to localStorage whenever it changes
     useEffect(() => { localStorage.setItem('todo-tasks', JSON.stringify(tasks)); }, [tasks]);
@@ -49,10 +59,11 @@ function ToDoList(){
     // Appends a new task and resets the input fields
     function addTask(){
         if(newTask.trim() !== ""){
-            setTasks(t => [...t, {id: nextId.current++, text: newTask, dueDate: newDueDate, category: newCategory}]);
+            setTasks(t => [...t, {id: nextId.current++, text: newTask, dueDate: newDueDate, category: newCategory, hasSubtasks: newHasSubtasks, subtasks: []}]);
             setNewTask("");
             setNewDueDate("");
             setNewCategory("");
+            setNewHasSubtasks(false);
         }
     }
 
@@ -60,17 +71,49 @@ function ToDoList(){
         setTasks(t => t.filter(task => task.id !== id));
     }
 
+    function addSubtask(taskId){
+        const text = (subtaskInputs[taskId] ?? "").trim();
+        if (!text) return;
+        setTasks(t => t.map(task => task.id === taskId
+            ? {...task, subtasks: [...(task.subtasks ?? []), {id: nextId.current++, text, dueDate: subtaskDateInputs[taskId] ?? "", completed: false}]}
+            : task));
+        setSubtaskInputs(s => ({...s, [taskId]: ""}));
+        setSubtaskDateInputs(s => ({...s, [taskId]: ""}));
+    }
+
+    function commitSubtaskEdit(taskId, subtaskId){
+        if (subtaskEditDraft.text.trim() !== "") {
+            setTasks(t => t.map(task => task.id === taskId
+                ? {...task, subtasks: task.subtasks.map(s => s.id === subtaskId ? {...s, text: subtaskEditDraft.text.trim(), dueDate: subtaskEditDraft.dueDate} : s)}
+                : task));
+        }
+        setEditingSubtask(null);
+        setSubtaskEditDraft({text: "", dueDate: ""});
+    }
+
+    function toggleSubtask(taskId, subtaskId){
+        setTasks(t => t.map(task => task.id === taskId
+            ? {...task, subtasks: task.subtasks.map(s => s.id === subtaskId ? {...s, completed: !s.completed} : s)}
+            : task));
+    }
+
+    function deleteSubtask(taskId, subtaskId){
+        setTasks(t => t.map(task => task.id === taskId
+            ? {...task, subtasks: task.subtasks.filter(s => s.id !== subtaskId)}
+            : task));
+    }
+
     function startEdit(task){
         setEditingId(task.id);
-        setEditDraft({text: task.text, dueDate: task.dueDate ?? "", category: task.category ?? ""});
+        setEditDraft({text: task.text, dueDate: task.dueDate ?? "", category: task.category ?? "", hasSubtasks: task.hasSubtasks ?? false});
     }
 
     function commitEdit(id){
         if(editDraft.text.trim() !== ""){
-            setTasks(t => t.map(task => task.id === id ? {...task, text: editDraft.text.trim(), dueDate: editDraft.dueDate, category: editDraft.category} : task));
+            setTasks(t => t.map(task => task.id === id ? {...task, text: editDraft.text.trim(), dueDate: editDraft.dueDate, category: editDraft.category, hasSubtasks: editDraft.hasSubtasks} : task));
         }
         setEditingId(null);
-        setEditDraft({text: "", dueDate: "", category: ""});
+        setEditDraft({text: "", dueDate: "", category: "", hasSubtasks: false});
     }
 
     // Adds a new category only if the name is non-empty and not already taken
@@ -198,6 +241,13 @@ function ToDoList(){
                     type="date"
                     value={newDueDate}
                     onChange={e => setNewDueDate(e.target.value)}/>
+                <label className="subtasks-toggle">
+                    <input
+                        type="checkbox"
+                        checked={newHasSubtasks}
+                        onChange={e => setNewHasSubtasks(e.target.checked)}/>
+                    Sub-tasks
+                </label>
                 <button
                     className="add-button"
                     onClick={addTask}>
@@ -216,10 +266,23 @@ function ToDoList(){
                         return a.dueDate.localeCompare(b.dueDate);
                     });
 
+                    const today = new Date(); today.setHours(0, 0, 0, 0);
                     const renderTask = (task, showPill = false) => {
                         const catObj = categories.find(c => c.name === task.category);
+                        const hasOverdueSubtask = (task.subtasks ?? []).some(s => !s.completed && s.dueDate && new Date(s.dueDate + 'T00:00:00') < today);
+                        const isOverdue = (task.dueDate && new Date(task.dueDate + 'T00:00:00') < today) || hasOverdueSubtask;
                         return (
-                            <li key={task.id}>
+                            <li key={task.id} className="task-item">
+                              <div className="task-row">
+                                {isOverdue && <span className="overdue-indicator" title="Overdue">!</span>}
+                                {task.hasSubtasks && (
+                                    <button
+                                        className={`subtasks-expand-btn${expandedIds.has(task.id) ? ' expanded' : ''}`}
+                                        onClick={() => setExpandedIds(s => { const n = new Set(s); n.has(task.id) ? n.delete(task.id) : n.add(task.id); return n; })}
+                                        title="Toggle subtasks">
+                                        ⤷
+                                    </button>
+                                )}
                                 {editingId === task.id ? (
                                     <span className="task-edit-row">
                                         <input
@@ -251,6 +314,11 @@ function ToDoList(){
                                             <span className="task-category" style={{backgroundColor: catObj.color, color: getContrastColor(catObj.color)}}>{catObj.name}</span>
                                         )}
                                         {task.dueDate && <span className="due-date"> - Due: {new Date(task.dueDate + 'T00:00:00').toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}</span>}
+                                        {task.hasSubtasks && (task.subtasks ?? []).length > 0 && (
+                                            <span className="subtask-progress">
+                                                {(task.subtasks ?? []).filter(s => s.completed).length} / {(task.subtasks ?? []).length}
+                                            </span>
+                                        )}
                                     </span>
                                 )}
                                 <button
@@ -263,6 +331,69 @@ function ToDoList(){
                                     onClick={() => deleteTask(task.id)}>
                                     ✕
                                 </button>
+                              </div>
+                              {task.hasSubtasks && (
+                                <div className={`subtask-panel${expandedIds.has(task.id) ? ' open' : ''}`}>
+                                    <ul className="subtask-list">
+                                        {[...(task.subtasks ?? [])].sort((a, b) => {
+                                            if (!a.dueDate && !b.dueDate) return 0;
+                                            if (!a.dueDate) return 1;
+                                            if (!b.dueDate) return -1;
+                                            return a.dueDate.localeCompare(b.dueDate);
+                                        }).map(s => (
+                                            <li key={s.id} className="subtask-item">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={s.completed}
+                                                    onChange={() => toggleSubtask(task.id, s.id)}/>
+                                                {editingSubtask?.taskId === task.id && editingSubtask?.subtaskId === s.id ? (
+                                                    <>
+                                                        <input
+                                                            className="subtask-input"
+                                                            autoFocus
+                                                            value={subtaskEditDraft.text}
+                                                            onChange={e => setSubtaskEditDraft(d => ({...d, text: e.target.value}))}
+                                                            onKeyDown={e => { if(e.key === 'Enter') commitSubtaskEdit(task.id, s.id); if(e.key === 'Escape') setEditingSubtask(null); }}/>
+                                                        <input
+                                                            type="date"
+                                                            className="subtask-date-input"
+                                                            value={subtaskEditDraft.dueDate}
+                                                            onChange={e => setSubtaskEditDraft(d => ({...d, dueDate: e.target.value}))}/>
+                                                        <button className="edit-button save-button" onClick={() => commitSubtaskEdit(task.id, s.id)}>Save</button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        {s.dueDate && !s.completed && new Date(s.dueDate + 'T00:00:00') < today && (
+                                                            <span className="overdue-indicator subtask-overdue" title="Overdue">!</span>
+                                                        )}
+                                                        <span className={s.completed ? 'subtask-text completed' : 'subtask-text'}>
+                                                            {s.text}
+                                                            {s.dueDate && <span className="due-date"> - Due: {new Date(s.dueDate + 'T00:00:00').toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}</span>}
+                                                        </span>
+                                                        <button className="edit-button" onClick={() => { setEditingSubtask({taskId: task.id, subtaskId: s.id}); setSubtaskEditDraft({text: s.text, dueDate: s.dueDate ?? ""}); }}>🖉</button>
+                                                    </>
+                                                )}
+                                                <button className="delete-button subtask-delete" onClick={() => deleteSubtask(task.id, s.id)}>✕</button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <div className="subtask-add-row">
+                                        <input
+                                            className="subtask-input"
+                                            type="text"
+                                            placeholder="Add a subtask..."
+                                            value={subtaskInputs[task.id] ?? ""}
+                                            onChange={e => setSubtaskInputs(s => ({...s, [task.id]: e.target.value}))}
+                                            onKeyDown={e => e.key === 'Enter' && addSubtask(task.id)}/>
+                                        <input
+                                            type="date"
+                                            className="subtask-date-input"
+                                            value={subtaskDateInputs[task.id] ?? ""}
+                                            onChange={e => setSubtaskDateInputs(s => ({...s, [task.id]: e.target.value}))}/>
+                                        <button className="add-button subtask-add-btn" onClick={() => addSubtask(task.id)}>Add</button>
+                                    </div>
+                                </div>
+                              )}
                             </li>
                         );
                     };
