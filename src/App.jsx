@@ -12,5 +12,4 @@ export default App
 // (Kinda ironic/funny that I'm creating a code-comment TODO list when I'm literally making a to-do list app)
 
 // TODO: 
-// Add automatic updates for users without a reinstall 
-// Add pictures for app icons, taskbar, start menu, etc.
+// Fix pictures for app icons, taskbar, start menu, etc.

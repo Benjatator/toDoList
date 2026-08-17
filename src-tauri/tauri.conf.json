@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Checklist",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "identifier": "io.benjatator.todolist",
   "build": {
     "frontendDist": "../dist",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "todolist",
+        "title": "Checklist",
         "width": 800,
         "height": 600,
         "resizable": true,

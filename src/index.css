@@ -1,7 +1,9 @@
+/* ── Global ─────────────────────────────────────────────── */
 body{
   background-color: hsla(0, 0%, 0%, 0.815)
 }
 
+/* ── Main container ─────────────────────────────────────── */
 .to-do-list{
   font-family: Arial, sans-serif;
   text-align: center;
@@ -13,6 +15,7 @@ h1{
   color: white;
 }
 
+/* ── Buttons ────────────────────────────────────────────── */
 button{
   font-size: 1.7rem;
   font-weight: bold;
@@ -32,6 +35,14 @@ button{
   background-color: hsl(125, 47%, 44%);
 }
 
+.delete-button,
+.edit-button{
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  flex-shrink: 0;
+}
+
 .delete-button{
   background-color: hsl(0, 63%, 42%);
 }
@@ -40,6 +51,50 @@ button{
   background-color: hsl(0, 63%, 32%);
 }
 
+.edit-button{
+  background-color: hsl(0, 0%, 34%);
+}
+
+.edit-button:hover{
+  background-color: hsl(0, 0%, 24%);
+}
+
+.save-button{
+  font-size: 1.1rem;
+  background-color: hsl(125, 47%, 54%);
+  color: white;
+}
+
+.save-button:hover{
+  background-color: hsl(125, 47%, 44%);
+}
+
+.task-edit-input{
+  flex: 1;
+  min-width: 0;
+  max-width: none;
+  font-size: inherit;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid hsl(213, 55%, 42%);
+}
+
+.task-edit-row{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.task-edit-row input,
+.task-edit-row select{
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+/* ── Add-task input row ─────────────────────────────────── */
 .input-row{
   display: flex;
   justify-content: center;
@@ -64,6 +119,7 @@ input[type="date"]{
   max-width: 280px;
 }
 
+/* ── Task list ──────────────────────────────────────────── */
 .task-list{
   max-width: 55%;
   margin: 0 auto;
@@ -96,6 +152,7 @@ li{
   border: 3px solid hsl(0, 0%, 85%);
   border-radius: 5px;
   display: flex;
+  gap: 8px;
   align-items: center;
 }
 
@@ -115,6 +172,7 @@ li{
   margin-left: 10px
 }
 
+/* ── Settings panel ─────────────────────────────────────── */
 .settings-bar{
   position: fixed;
   top: 16px;
@@ -162,6 +220,7 @@ li{
   cursor: pointer;
 }
 
+/* ── Category manager (inside settings) ─────────────────── */
 .category-manager{
   margin-top: 14px;
 }
@@ -280,6 +339,7 @@ li{
   background-color: hsl(220, 15%, 25%);
 }
 
+/* ── In-app updater ─────────────────────────────────────── */
 .updater-row{
   display: flex;
   flex-wrap: wrap;
@@ -317,6 +377,7 @@ li{
   color: hsl(0, 63%, 60%);
 }
 
+/* ── Changelog modal ────────────────────────────────────── */
 .changelog-overlay{
   position: fixed;
   inset: 0;

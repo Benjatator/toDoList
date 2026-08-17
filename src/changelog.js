@@ -1,5 +1,13 @@
 const CHANGELOG = [
     {
+        version: "0.2.4",
+        date: "2026-08-27",
+        changes: [
+            "• Added ability to edit tasks.",
+            "• Commented backend code for readability.",
+        ],
+    },
+    {
         version: "0.2.3",
         date: "2026-08-20",
         changes: [
