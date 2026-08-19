@@ -1,5 +1,13 @@
 const CHANGELOG = [
     {
+        version: "0.3.1",
+        date: "2026-08-18",
+        changes: [
+            "• Cleaned up back-end.",
+            "• Save buttons now display '✓' due to smaller button sizes."
+        ],
+    },
+    {
         version: "0.3.0",
         date: "2026-08-17",
         changes: [
@@ -20,7 +28,7 @@ const CHANGELOG = [
             "• Added ability to edit tasks.",
             "• Overdue tasks will now be marked with a red '!'.",
             "• Tasks can now have sub-tasks that can be checked off, each with their own due date. If a sub-task is past due, it will also give itself and its main task an overdue indicator.",
-            "• Commented some backend code for readability.",
+            "• Improved readability on back-end.",
         ],
     },
     {

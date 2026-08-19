@@ -77,10 +77,6 @@ function ToDoList(){
     useEffect(() => { localStorage.setItem('todo-taskListWidth', JSON.stringify(taskListWidth)); }, [taskListWidth]);
     useEffect(() => { localStorage.setItem('todo-collapseFarTasks', JSON.stringify(collapseFarTasks)); }, [collapseFarTasks]);
 
-    function handleInputChange(event){
-        setNewTask(event.target.value);
-    }
-
     // Appends a new task and resets the input fields
     function addTask(){
         if(newTask.trim() !== ""){
@@ -96,6 +92,7 @@ function ToDoList(){
         setTasks(t => t.filter(task => task.id !== id));
     }
 
+    // --- Subtask handlers ---
     function addSubtask(taskId){
         const text = (subtaskInputs[taskId] ?? "").trim();
         if (!text) return;
@@ -128,6 +125,7 @@ function ToDoList(){
             : task));
     }
 
+    // --- Task edit handlers ---
     function startEdit(task){
         setEditingId(task.id);
         setEditDraft({text: task.text, dueDate: task.dueDate ?? "", category: task.category ?? "", hasSubtasks: task.hasSubtasks ?? false});
@@ -141,6 +139,7 @@ function ToDoList(){
         setEditDraft({text: "", dueDate: "", category: "", hasSubtasks: false});
     }
 
+    // --- Category handlers ---
     // Adds a new category only if the name is non-empty and not already taken
     function addCategory(){
         const trimmed = newCategoryInput.trim();
@@ -151,6 +150,7 @@ function ToDoList(){
         setNewCategoryColor("#5b8dd9");
     }
 
+    // --- Updater ---
     async function handleUpdate(){
         if (updateStatus === 'checking' || updateStatus === 'downloading') return;
         setUpdateStatus('checking');
@@ -176,7 +176,7 @@ function ToDoList(){
 
     // Removes a category and clears it from any tasks that used it
     function deleteCategory(name){
-        setCategories(c => c.filter(c => c.name !== name));
+        setCategories(cats => cats.filter(c => c.name !== name));
         setTasks(t => t.map(task => task.category === name ? {...task, category: ""} : task));
     }
 
@@ -185,12 +185,14 @@ function ToDoList(){
         <div className="to-do-list">
             <h1>To-Do List</h1>
 
+            {/* Settings gear button — toggles the settings panel */}
             <div className="settings-bar">
                 <button className="settings-button" onClick={() => setShowSettings(s => !s)}>
                     ⚙
                 </button>
             </div>
 
+            {/* Settings panel — shown when gear button is active */}
             {showSettings && (
                 <div className="settings-panel">
                     <label className="settings-toggle">
@@ -208,6 +210,7 @@ function ToDoList(){
                         Collapse tasks beyond 30 days
                     </label>
 
+                    {/* Task list width slider */}
                     <div className="width-slider-row">
                         <span className="width-slider-label">Task Bar Width: {taskListWidth}%</span>
                         <input
@@ -218,6 +221,7 @@ function ToDoList(){
                             onChange={e => setTaskListWidth(Number(e.target.value))}/>
                     </div>
 
+                    {/* Category manager — add/remove named color categories */}
                     <div className="category-manager">
                         <div className="category-add-row">
                             <input
@@ -244,6 +248,7 @@ function ToDoList(){
                         </ul>
                     </div>
 
+                    {/* Update checker */}
                     <div className="updater-row">
                         <button
                             className="updater-button"
@@ -251,23 +256,25 @@ function ToDoList(){
                             disabled={updateStatus === 'checking' || updateStatus === 'downloading'}>
                             {updateStatus === 'checking' && '🔍 Checking...'}
                             {updateStatus === 'downloading' && `⬇️ Installing v${updateVersion}...`}
-                            {(updateStatus === 'idle' || updateStatus === 'upToDate' || updateStatus === 'available' || updateStatus === 'error') && '🔄 Check for Updates'}
+                            {(updateStatus === 'idle' || updateStatus === 'upToDate' || updateStatus === 'error') && '🔄 Check for Updates'}
                         </button>
                         {updateStatus === 'upToDate' && <span className="updater-status updater-ok">✓ Up to date</span>}
                         {updateStatus === 'error' && <span className="updater-status updater-err">✕ {updateError ?? 'Update check failed'}</span>}
                     </div>
 
+                    {/* Changelog button — opens the version history modal */}
                     <button className="changelog-button" onClick={() => setShowChangelog(true)}>📋 View Changelog</button>
                 </div>
             )}
 
+            {/* New task input row — text, category, due date, subtasks toggle, add button */}
             <div className="input-row">
                 <input 
                     className="task-input"
                     type="text"
                     placeholder="Enter a task..."
                     value={newTask}
-                    onChange={handleInputChange}/>
+                    onChange={e => setNewTask(e.target.value)}/>
                 {categories.length > 0 && (
                     <select
                         className="category-select"
@@ -293,11 +300,11 @@ function ToDoList(){
                 <button
                     className="add-button"
                     onClick={addTask}>
-
                     Add
                 </button>
             </div>
 
+            {/* Task list — sorted by due date; rendered flat or grouped by category */}
             <div className="task-list" style={{width: `${taskListWidth}%`, maxWidth: `${taskListWidth}%`}}>
                 {(() => {
                     // Sort tasks by due date ascending; undated tasks go to the bottom
@@ -308,14 +315,18 @@ function ToDoList(){
                         return a.dueDate.localeCompare(b.dueDate);
                     });
 
+                    // Renders a single task row, including its edit form and subtask panel
                     const renderTask = (task, showPill = false) => {
+                        const subtasks = task.subtasks ?? [];
                         const catObj = categories.find(c => c.name === task.category);
-                        const hasOverdueSubtask = (task.subtasks ?? []).some(s => !s.completed && s.dueDate && new Date(s.dueDate + 'T00:00:00') < today);
+                        const hasOverdueSubtask = subtasks.some(s => !s.completed && s.dueDate && new Date(s.dueDate + 'T00:00:00') < today);
                         const isOverdue = (task.dueDate && new Date(task.dueDate + 'T00:00:00') < today) || hasOverdueSubtask;
                         return (
                             <li key={task.id} className="task-item">
                               <div className="task-row">
+                                {/* Overdue indicator */}
                                 {isOverdue && <span className="overdue-indicator" title="Overdue">!</span>}
+                                {/* Subtask expand/collapse toggle */}
                                 {task.hasSubtasks && (
                                     <button
                                         className={`subtasks-expand-btn${expandedIds.has(task.id) ? ' expanded' : ''}`}
@@ -324,6 +335,7 @@ function ToDoList(){
                                         ⤷
                                     </button>
                                 )}
+                                {/* Task text — shows edit form when this task is being edited */}
                                 {editingId === task.id ? (
                                     <span className="task-edit-row">
                                         <input
@@ -355,28 +367,31 @@ function ToDoList(){
                                             <span className="task-category" style={{backgroundColor: catObj.color, color: getContrastColor(catObj.color)}}>{catObj.name}</span>
                                         )}
                                         {task.dueDate && <span className="due-date"> - Due: {new Date(task.dueDate + 'T00:00:00').toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}</span>}
-                                        {task.hasSubtasks && (task.subtasks ?? []).length > 0 && (
+                                        {task.hasSubtasks && subtasks.length > 0 && (
                                             <span className="subtask-progress">
-                                                {(task.subtasks ?? []).filter(s => s.completed).length} / {(task.subtasks ?? []).length}
+                                                {subtasks.filter(s => s.completed).length} / {subtasks.length}
                                             </span>
                                         )}
                                     </span>
                                 )}
+                                {/* Edit / Save button */}
                                 <button
                                     className={editingId === task.id ? "edit-button save-button" : "edit-button"}
                                     onClick={() => editingId === task.id ? commitEdit(task.id) : startEdit(task)}>
-                                    {editingId === task.id ? "Save" : "🖉"}
+                                    {editingId === task.id ? "✓" : "🖉"}
                                 </button>
+                                {/* Delete task button */}
                                 <button
                                     className="delete-button"
                                     onClick={() => deleteTask(task.id)}>
                                     ✕
                                 </button>
                               </div>
+                              {/* Subtask panel — visible when expanded */}
                               {task.hasSubtasks && (
                                 <div className={`subtask-panel${expandedIds.has(task.id) ? ' open' : ''}`}>
                                     <ul className="subtask-list">
-                                        {[...(task.subtasks ?? [])].sort((a, b) => {
+                                        {[...subtasks].sort((a, b) => {
                                             if (!a.dueDate && !b.dueDate) return 0;
                                             if (!a.dueDate) return 1;
                                             if (!b.dueDate) return -1;
@@ -400,7 +415,7 @@ function ToDoList(){
                                                             className="subtask-date-input"
                                                             value={subtaskEditDraft.dueDate}
                                                             onChange={e => setSubtaskEditDraft(d => ({...d, dueDate: e.target.value}))}/>
-                                                        <button className="edit-button save-button" onClick={() => commitSubtaskEdit(task.id, s.id)}>Save</button>
+                                                        <button className="edit-button save-button" onClick={() => commitSubtaskEdit(task.id, s.id)}>✓</button>
                                                     </>
                                                 ) : (
                                                     <>
@@ -418,6 +433,7 @@ function ToDoList(){
                                             </li>
                                         ))}
                                     </ul>
+                                    {/* Add subtask input row */}
                                     <div className="subtask-add-row">
                                         <input
                                             className="subtask-input"
@@ -486,6 +502,7 @@ function ToDoList(){
 
         </div>
 
+        {/* Changelog modal — shown on first launch after an update, or via settings */}
         {showChangelog && (
             <div className="changelog-overlay" onClick={() => setShowChangelog(false)}>
                 <div className="changelog-modal" onClick={e => e.stopPropagation()}>
