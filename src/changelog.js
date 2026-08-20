@@ -1,6 +1,6 @@
 const CHANGELOG = [
     {
-        version: "0.3.1",
+        version: "0.3.2",
         date: "2026-08-20",
         changes: [
             "• Cleaned up back-end.",
